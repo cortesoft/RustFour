@@ -8,4 +8,5 @@ mod tests {
 
 //pub mod player;
 
+extern crate rand;
 pub mod game;
