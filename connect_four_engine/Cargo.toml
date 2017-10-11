@@ -1,9 +1,6 @@
 [package]
-name = "connect_four"
+name = "connect_four_engine"
 version = "0.1.0"
 authors = ["Daniel Lockhart <cortesoft@gmail.com>"]
 
 [dependencies]
-connect_four_engine = { path = "connect_four_engine" }
-
-[workspace]
