@@ -5,7 +5,7 @@ use rand;
 use rand::Rng;
 
 pub fn play() {
-    let mut board = board::new_board(8, 8, 4);
+    let mut board = board::Board::new_board(8, 8, 4);
     board.print();
     for i in 0..200 {
         println!("On turn {}", i);

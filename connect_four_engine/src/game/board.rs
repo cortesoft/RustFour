@@ -1,20 +1,3 @@
-
-pub fn new_board(num_rows: u8, num_columns: u8, connect_number: u8) -> Board {
-    let mut board = Board {
-        num_rows,
-        num_columns,
-        connect_number,
-        last_move: num_rows + 1,
-        columns: Vec::new(),
-        next_move: GamePiece::X,
-        num_moves: 0
-    };
-    while board.columns.len() < (num_columns as usize) {
-        board.columns.push(Column::new(num_rows));
-    }
-    board
-}
-
 #[derive(PartialEq)]
 pub enum GamePiece {
     X,
@@ -64,6 +47,22 @@ pub struct Board {
 }
 
 impl Board {
+    pub fn new_board(num_rows: u8, num_columns: u8, connect_number: u8) -> Board {
+        let mut board = Board {
+            num_rows,
+            num_columns,
+            connect_number,
+            last_move: num_rows + 1,
+            columns: Vec::new(),
+            next_move: GamePiece::X,
+            num_moves: 0
+        };
+        while board.columns.len() < (num_columns as usize) {
+            board.columns.push(Column::new(num_rows));
+        }
+        board
+    }
+
     pub fn print(&self) {
         println!("\n\n");
         for i in 0..self.num_columns {
