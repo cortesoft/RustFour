@@ -1,10 +1,52 @@
+use std::fmt;
+
 #[derive(PartialEq)]
+#[derive(Debug)]
 pub enum GamePiece {
     X,
     O,
     Dash
 }
 
+impl fmt::Display for GamePiece {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let str_version = match self {
+            &GamePiece::X => "X",
+            &GamePiece::O => "O",
+            &GamePiece::Dash => "-"
+        };
+        write!(f, "{}", str_version)
+    }
+}
+
+#[derive(PartialEq)]
+#[derive(Debug)]
+pub enum Direction {
+    UpLeft,
+    Left,
+    DownLeft,
+    Down,
+    UpRight,
+    Right,
+    DownRight,
+    Up
+}
+
+impl fmt::Display for Direction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let str_version = match self {
+            &Direction::UpLeft => "Up Left",
+            &Direction::Left => "Left",
+            &Direction::DownLeft => "Down Left",
+            &Direction::Down => "Down",
+            &Direction::DownRight => "Down Right",
+            &Direction::Right => "Right",
+            &Direction::UpRight => "Up Right",
+            &Direction::Up => "Up"
+        };
+        write!(f, "{}", str_version)
+    }
+}
 struct Column {
     num_rows: u8,
     next_row: u8,
@@ -89,9 +131,11 @@ impl Board {
     pub fn have_winner(&self) -> u8 {
         //We will go through each direction:
         //up left, left, down left, down, up right, right, and down right
-        if self.streak(-1,1,0) || self.streak(-1,0,0) || self.streak(-1,-1,0) ||
-            self.streak(0,-1,0) || self.streak(1,1,0) || self.streak(1,0,0) ||
-            self.streak(1,-1,0) {
+        let targ_length = self.connect_number - 1;
+        if self.combined_streak(Direction::UpLeft, Direction::DownRight) >= targ_length || 
+        self.combined_streak(Direction::Left, Direction::Right) >= targ_length ||
+        self.combined_streak(Direction::UpRight, Direction::DownLeft) >= targ_length ||
+        self.streak(&Direction::Down) >= targ_length {
             if let GamePiece::X = self.get_last_move() {
                 1
             } else {
@@ -102,34 +146,63 @@ impl Board {
         }
     }
 
-    pub fn streak(&self, x_delta: i8, y_delta: i8, mut length: u8) -> bool {
-        if length == 0 {
-            length = self.connect_number;
-        }
+    pub fn combined_streak(&self, direction1: Direction, direction2: Direction) -> u8 {
+        //let dir1 = self.streak(&direction1);
+        //let dir2 = self.streak(&direction2);
+        //let cur = self.last_move_location();
+        //println!("Last Move: {}, {} - Streak in {} is {}, Streak in {} is {}", cur.0, cur.1, &direction1, dir1, &direction2, dir2);
+        //dir1 + dir2
+        self.streak(&direction1) + self.streak(&direction2)
+    }
+
+    pub fn streak(&self, direction: &Direction) -> u8 {
         let mut current_loc = self.last_move_location();
-        if (x_delta < 0 && current_loc.0 < length - 1) || (y_delta < 0 && current_loc.1 < length - 1){
-            return false;
-        }
-        let mut streak_length = 1; //current piece counts as one!
+        let mut streak_length = 0; //dont count current piece
         let piece = self.get_last_move();
-        while streak_length < length {
-            match x_delta {
-                -1 => current_loc.0 -= 1,
-                1 => current_loc.0 += 1,
-                _ => ()
-            }
-            match y_delta {
-                -1 => current_loc.1 -= 1,
-                1 => current_loc.1 += 1,
-                _ => ()
-            }
-            if self.game_piece_at(current_loc.0, current_loc.1) == piece {
-                streak_length += 1;
-            } else {
-                return false;
+        loop {
+            match self.next_position_in_direction(&direction, current_loc.0, current_loc.1) {
+                None => { break; },
+                Some(new_loc) => {
+                    if piece == self.game_piece_at(new_loc.0, new_loc.1) {
+                        streak_length += 1;
+                        current_loc = new_loc;
+                    } else {
+                        break;
+                    }
+                }
             }
         }
-        true
+        streak_length
+    }
+
+    fn next_position_in_direction(&self, in_direction: &Direction, x: u8, y: u8) -> Option<(u8, u8)> {
+        let (delta_x, delta_y) = match in_direction {
+            &Direction::UpLeft => (-1, 1),
+            &Direction::Left => (-1, 0),
+            &Direction::DownLeft => (-1, -1),
+            &Direction::Down => (0, -1),
+            &Direction::DownRight => (1, -1),
+            &Direction::Right => (1, 0),
+            &Direction::UpRight => (1,1),
+            &Direction::Up => (0,1)
+        };
+        if (delta_x < 0 && x == 0) || (delta_y < 0 && y == 0) {
+            return None;
+        }
+        if (delta_x > 0 && self.num_columns <= x) || (delta_y > 0 && self.num_rows <= y) {
+            return None;
+        }
+        let new_x = match delta_x {
+            -1 => x - 1,
+            1 => x + 1,
+            _ => x
+        };
+        let new_y = match delta_y {
+            -1 => y - 1,
+            1 => y + 1,
+            _ => y
+        };
+        Some((new_x, new_y))
     }
 
     pub fn play_piece(&mut self, col: u8) -> bool {
@@ -145,7 +218,7 @@ impl Board {
         }
     }
 
-    fn get_current_move(&self) -> GamePiece {
+    pub fn get_current_move(&self) -> GamePiece {
         if let GamePiece::X = self.next_move {
             GamePiece::X
         } else {
@@ -153,7 +226,7 @@ impl Board {
         }
     }
 
-    fn get_next_move(&self) -> GamePiece {
+    pub fn get_next_move(&self) -> GamePiece {
         if let GamePiece::X = self.next_move {
             GamePiece::O
         } else {
@@ -161,7 +234,7 @@ impl Board {
         }
     }
 
-    fn get_last_move(&self) -> GamePiece {
+    pub fn get_last_move(&self) -> GamePiece {
         self.get_next_move()
     }
 
