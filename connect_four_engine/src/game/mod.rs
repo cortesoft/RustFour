@@ -3,28 +3,25 @@
 mod board;
 pub mod players;
 
-use rand;
-use rand::Rng;
 use self::board::*;
 use self::players::Player;
 use self::players::human::Human;
+use self::players::random::Random;
 
 pub fn play() {
     let player1 = Human {
         name: String::from("Daniel")
     };
+    let player2 = Random {};
     let mut board = Board::new_board(8, 8, 4);
     board.print();
     for i in 0..500 {
         println!("On turn {}", i);
-        let mut mymove: u8 = 0;
+        let mymove: u8;
         if let GamePiece::X = board.get_current_move() {
             mymove = player1.which_move(&board);
         } else {
-            mymove = rand::thread_rng().gen_range(0, 8);
-            while !board.valid_move(mymove){
-                mymove = rand::thread_rng().gen_range(0, 8);
-            }
+            mymove = player2.which_move(&board);
         }
         println!("Playing {}", mymove);
         board.play_piece(mymove);

@@ -111,7 +111,7 @@ impl Board {
             print!(" {} ", i);
         }
         print!("\n");
-        for i in 0..self.num_columns {
+        for _ in 0..self.num_columns {
             print!("===");
         }
         print!("\n");
