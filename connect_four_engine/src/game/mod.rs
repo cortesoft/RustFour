@@ -13,6 +13,7 @@ pub fn play() {
         while !board.valid_move(mymove){
             mymove = rand::thread_rng().gen_range(0, 8);
         }
+        println!("Playing {}", mymove);
         board.play_piece(mymove);
         board.print();
         match board.have_winner() {
