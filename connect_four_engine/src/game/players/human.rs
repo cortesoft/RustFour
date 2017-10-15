@@ -8,8 +8,8 @@ pub struct Human {
 }
 
 impl Player for Human {
-    fn which_move(&self, board: &Board) -> u8 {
-        println!("Play which column? (You are {}'s)", board.get_current_move());
+    fn which_move(&mut self, board: &Board) -> u8 {
+        println!("Play which column, {}? (You are {}'s)", self.name, board.get_current_move());
         let mut my_move = String::new();
         let mut my_move_i: u8;
         loop {

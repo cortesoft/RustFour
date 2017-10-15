@@ -7,10 +7,10 @@ use super::*;
 pub struct Random {}
 
 impl Player for Random {
-    fn which_move(&self, board: &Board) -> u8 {
-        let mut mymove: u8 = rand::thread_rng().gen_range(0, 8);
+    fn which_move(&mut self, board: &Board) -> u8 {
+        let mut mymove: u8 = rand::thread_rng().gen_range(0, board.num_rows);
         while !board.valid_move(mymove){
-            mymove = rand::thread_rng().gen_range(0, 8);
+            mymove = rand::thread_rng().gen_range(0, board.num_rows);
         }
         mymove
     }

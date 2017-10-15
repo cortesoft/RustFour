@@ -2,6 +2,7 @@ use std::fmt;
 
 #[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum GamePiece {
     X,
     O,
@@ -21,6 +22,7 @@ impl fmt::Display for GamePiece {
 
 #[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Clone)]
 pub enum Direction {
     UpLeft,
     Left,
@@ -47,6 +49,8 @@ impl fmt::Display for Direction {
         write!(f, "{}", str_version)
     }
 }
+
+#[derive(Clone)]
 struct Column {
     num_rows: u8,
     next_row: u8,
@@ -78,14 +82,16 @@ impl Column {
         self.next_row < self.num_rows
     }
 }
+
+#[derive(Clone)]
 pub struct Board {
-    num_rows: u8,
-    num_columns: u8,
-    last_move: u8,
+    pub num_rows: u8,
+    pub num_columns: u8,
+    pub last_move: u8,
     columns: Vec<Column>,
     next_move: GamePiece,
     num_moves: u16,
-    connect_number: u8
+    pub connect_number: u8
 }
 
 impl Board {
@@ -153,6 +159,13 @@ impl Board {
         //println!("Last Move: {}, {} - Streak in {} is {}, Streak in {} is {}", cur.0, cur.1, &direction1, dir1, &direction2, dir2);
         //dir1 + dir2
         self.streak(&direction1) + self.streak(&direction2)
+    }
+
+    pub fn total_connected(&self) -> u8 {
+        self.streak(&Direction::UpLeft) + self.streak(&Direction::DownRight) +
+        self.streak(&Direction::Left) + self.streak(&Direction::Right) +
+        self.streak(&Direction::UpRight) + self.streak(&Direction::DownLeft) +
+        self.streak(&Direction::Down)
     }
 
     pub fn streak(&self, direction: &Direction) -> u8 {

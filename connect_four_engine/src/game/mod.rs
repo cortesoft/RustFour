@@ -6,7 +6,7 @@ pub mod players;
 use self::board::*;
 use self::players::Player;
 
-pub fn play<T: Player, U: Player>(player1: T, player2: U) {
+pub fn play<T: Player, U: Player>(mut player1: T, mut player2: U) {
     let mut board = Board::new_board(8, 8, 4);
     board.print();
     for i in 0..500 {
