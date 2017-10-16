@@ -149,9 +149,13 @@ impl Robot {
         }
         //Ok did not lead to victory or defeat automatically
         if win_count == valid_move_count {
+            //println!("Always win for every opponent move, {} current depth col {}",
+            //    current_depth, the_move);
             return AlwaysWin;
         }
         if loss_count == valid_move_count {
+            //println!("Always lose for every move, {} current depth col {}",
+            //    current_depth, the_move);
             return AlwaysLose;
         }
         let future_val = value_sum / valid_move_count as isize;

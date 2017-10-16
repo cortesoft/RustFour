@@ -6,7 +6,7 @@ pub mod players;
 use self::board::*;
 use self::players::Player;
 
-pub fn play<T: Player, U: Player>(mut player1: T, mut player2: U) {
+pub fn play<T: Player, U: Player>(mut player1: T, mut player2: U) -> u8 {
     let mut board = Board::new_board(8, 8, 4);
     board.print();
     for i in 0..500 {
@@ -23,14 +23,14 @@ pub fn play<T: Player, U: Player>(mut player1: T, mut player2: U) {
         match board.have_winner() {
             1 => {
                 println!("X won!");
-                break;
+                return 1;
             },
             2 => {
                 println!("O won!");
-                break;
+                return 2;
             },
             _ => ()
         }
     }
-    
+    0
 }
