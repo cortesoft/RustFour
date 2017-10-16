@@ -1,4 +1,5 @@
 //Just return smart moves
+use std::io;
 use rand;
 use rand::Rng;
 use super::Player;
@@ -29,16 +30,24 @@ impl Player for Robot {
         let mut possible_moves = Vec::new();
         for col in 0..board.num_rows {
             match self.value_for_move(col, &board, 0) {
-                AlwaysWin => { return col; },
+                AlwaysWin => {
+                    println!("Got an AlwaysWin for move {}", col);
+                    return col; 
+                },
                 MaybeWin(move_val) => {
+                    println!("Got MaybeWin with val {} for {}", move_val, col);
                     if move_val > max_value {
+                        println!("{} is now the max value", col);
+                        possible_moves = Vec::new();
                         max_value = move_val;
                         mymove = col;
                     } else if move_val == max_value {
+                        println!("{} has the same move_val, adding to possibles", col);
                         possible_moves.push(col);
                     }
                 },
-                _ => ()
+                AlwaysLose => println!("Got AlwaysLose for {}", col),
+                InvalidMove => println!("Got invalid move for {}", col)
             }
         }
         if possible_moves.len() > 0 {
@@ -50,6 +59,30 @@ impl Player for Robot {
             mymove = rand::thread_rng().gen_range(0, board.num_rows);
         }
         mymove
+    }
+
+    fn build_player() -> Robot {
+        let mut max_depth: u8;
+        let mut choice = String::new();
+        loop {
+            println!("For robot, how deep to look?");
+            io::stdin().read_line(&mut choice)
+                .expect("Failed to read line");
+            max_depth = match choice.trim().parse() {
+                Ok(num) => num,
+                Err(_) => {
+                    println!("Sorry, {} is not a valid number", choice.trim());
+                    choice = String::new();
+                    continue;
+                }
+            };
+            if max_depth == 0 || max_depth > 10 {
+                println!("Invalid depth");
+                continue;
+            }
+            break;
+        }
+        Robot::build_robot(max_depth)
     }
 }
 

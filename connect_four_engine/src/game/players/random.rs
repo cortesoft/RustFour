@@ -14,4 +14,8 @@ impl Player for Random {
         }
         mymove
     }
+
+    fn build_player() -> Random {
+        Random {}
+    }
 }

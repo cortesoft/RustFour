@@ -31,4 +31,14 @@ impl Player for Human {
         }
         my_move_i
     }
+
+    fn build_player() -> Human {
+        println!("What is the human's name?");
+        let mut name = String::new();
+        io::stdin().read_line(&mut name)
+            .expect("Failed to read line");
+        Human {
+            name
+        }
+    }
 }
