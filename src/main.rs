@@ -8,19 +8,32 @@ use game::players::random::Random;
 use game::players::robot::Robot;
 
 fn main() {
-    let players = (get_player(1), get_player(2));
-    match players {
-        (1,1) => game::play(Human::build_player(),Human::build_player()),
-        (1,2) => game::play(Human::build_player(),Robot::build_player()),
-        (1,3) => game::play(Human::build_player(),Random::build_player()),
-        (2,1) => game::play(Robot::build_player(),Human::build_player()),
-        (2,2) => game::play(Robot::build_player(),Robot::build_player()),
-        (2,3) => game::play(Robot::build_player(),Random::build_player()),
-        (3,1) => game::play(Random::build_player(),Human::build_player()),
-        (3,2) => game::play(Random::build_player(),Robot::build_player()),
-        (3,3) => game::play(Random::build_player(),Random::build_player()),
-        (_,_) => panic!("Bad combo!")
+    let mut player_1_wins: usize = 0;
+    let mut player_2_wins: usize = 0;
+    for i in 0..500 {
+        println!("Playing game {}, score is X {} - O {}",
+            i, player_1_wins, player_2_wins);
+        if game::play(Robot::build_robot(3), Robot::build_robot(7)) == 1 {
+            player_1_wins += 1;
+        } else {
+            player_2_wins += 1;
+        }
     }
+    println!("In 500 games, player X won {} and player O won {}",
+        player_1_wins, player_2_wins);
+    //let players = (get_player(1), get_player(2));
+    //match players {
+    //    (1,1) => game::play(Human::build_player(),Human::build_player()),
+    //    (1,2) => game::play(Human::build_player(),Robot::build_player()),
+    //    (1,3) => game::play(Human::build_player(),Random::build_player()),
+     //   (2,1) => game::play(Robot::build_player(),Human::build_player()),
+    //    (2,2) => game::play(Robot::build_player(),Robot::build_player()),
+    //    (2,3) => game::play(Robot::build_player(),Random::build_player()),
+    //    (3,1) => game::play(Random::build_player(),Human::build_player()),
+    //    (3,2) => game::play(Random::build_player(),Robot::build_player()),
+    //    (3,3) => game::play(Random::build_player(),Random::build_player()),
+    //    (_,_) => panic!("Bad combo!")
+    //}
 }
 
 fn get_player(p_num: u8) -> u8 {
