@@ -2,6 +2,11 @@
 use std::io;
 use rand;
 use rand::Rng;
+use std::thread;
+use std::thread::JoinHandle;
+use std::sync::mpsc;
+use std::sync::mpsc::Sender;
+use std::sync::mpsc::Receiver;
 use super::Player;
 use super::*;
 
@@ -15,10 +20,14 @@ enum MoveValue {
 
 use self::MoveValue::*;
 
-pub struct Robot {
+pub struct Robot<'a> {
     max_depth: u8,
     val_per_connection: u16,
-    my_game_piece: GamePiece
+    my_game_piece: GamePiece,
+    threads: Vec<JoinHandle<()>>,
+    thread_pipes: Vec<Sender<(&'a Robot, u8, &'a Board)>>,
+    receiver: Receiver<(MoveValue, u8)>,
+    channel_sender: Sender<(MoveValue, u8)>
 }
 
 impl Player for Robot {
@@ -28,8 +37,21 @@ impl Player for Robot {
         let mut mymove = u8::max_value();
         let mut max_value: isize = isize::min_value();
         let mut possible_moves = Vec::new();
-        for col in 0..board.num_rows {
-            match self.value_for_move(col, &board, 0) {
+        self.create_threads(board.num_rows);
+        let mut move_vals: Vec<(MoveValue, u8)> = Vec::new();
+        for thread_col in 0..board.num_rows {
+            let to_send = (self, thread_col, board);
+            self.thread_pipes[thread_col as usize].send(to_send).unwrap();
+        }
+        //Now listen for responses
+        while move_vals.len() < board.num_rows as usize {
+            let resp: (MoveValue, u8) = self.receiver.recv().unwrap();
+            println!("Got move back for {}", resp.1);
+            move_vals.push(resp);
+        }
+        for move_val in move_vals.iter() {
+            let (val, col) = move_val;
+            match val {
                 AlwaysWin => {
                     println!("Got an AlwaysWin for move {}", col);
                     return col; 
@@ -88,10 +110,15 @@ impl Player for Robot {
 
 impl Robot {
     pub fn build_robot(max_depth: u8) -> Robot {
+        let (tx, rx) = mpsc::channel();
         Robot {
             max_depth,
             my_game_piece: GamePiece::Dash,
-            val_per_connection: 0
+            val_per_connection: 0,
+            threads: Vec::new(),
+            thread_pipes: Vec::new(),
+            receiver: rx,
+            channel_sender: tx
         }
     }
 
@@ -168,6 +195,25 @@ impl Robot {
             tc_val as isize
         } else {
             0 - (tc_val as isize)
+        }
+    }
+
+    fn create_threads(&mut self, num_threads: u8) {
+        while self.threads.len() < num_threads as usize {
+            //Communication with this thread
+            let (tx, rx) = mpsc::channel();
+            //The sender for this thread back to main
+            let my_sender = self.channel_sender.clone();
+            let my_handle = thread::spawn(move||{
+                loop {
+                    let (rob, the_move, board) =
+                        rx.recv().unwrap();
+                    let resp = (rob.value_for_move(the_move, board, 0), the_move);
+                    my_sender.send(resp).unwrap();
+                }
+            });
+            self.threads.push(my_handle);
+            self.thread_pipes.push(tx);
         }
     }
 }
