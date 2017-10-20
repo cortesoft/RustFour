@@ -14,8 +14,8 @@ pub struct Game<T: Player, U: Player> {
 
 impl<T: Player, U: Player> Game<T, U> {
 
-    pub fn new_game(mut player_1: T, mut player_2: U, rows: u8, cols: u8, conn: u8) -> Game<T,U> {
-        let mut board_template = Board::new_board(rows, cols, conn);
+    pub fn new_game(player_1: T, player_2: U, rows: u8, cols: u8, conn: u8) -> Game<T,U> {
+        let board_template = Board::new_board(rows, cols, conn);
         Game {
             player_1,
             player_2,

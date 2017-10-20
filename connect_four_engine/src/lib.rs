@@ -11,4 +11,5 @@ mod tests {
 //pub mod player;
 
 extern crate rand;
+extern crate scoped_threadpool;
 pub mod game;
