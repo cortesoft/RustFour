@@ -40,19 +40,19 @@ impl Player for SmartBot {
             move_vals.push(MoveValueFor { move_val: InvalidMove, column: col});
         }
         let mut thread_pool = Pool::new(board.num_columns as u32);
-        println!("Starting threads");
+        //println!("Starting threads");
         thread_pool.scoped(|scope| {
             for mvf in &mut move_vals {
                 let my_self = &self;
                 scope.execute(move || {
-                    println!("In thread, checking {}", mvf.column);
+                    //println!("In thread, checking {}", mvf.column);
                     let this_move_val = my_self.value_for_move(mvf.column, &board, 0);
-                    println!("Got value for {} in thread. Storing...", mvf.column);
+                    //println!("Got value for {} in thread. Storing...", mvf.column);
                     mvf.move_val = this_move_val;
                 });
             }
         });
-        println!("Thread are done, checking values");
+        //println!("Thread are done, checking values");
         for move_val_for in move_vals.iter() {
             match move_val_for.move_val {
                 AlwaysWin => {
@@ -60,21 +60,22 @@ impl Player for SmartBot {
                     return move_val_for.column; 
                 },
                 MaybeWin(move_val) => {
-                    println!("Got MaybeWin with val {} for {}",
-                        move_val, move_val_for.column);
+                    //println!("Got MaybeWin with val {} for {}",
+                        //move_val, move_val_for.column);
                     if move_val > max_value {
-                        println!("{} is now the max value", move_val_for.column);
+                        //println!("{} is now the max value", move_val_for.column);
                         possible_moves = Vec::new();
                         max_value = move_val;
                         mymove = move_val_for.column;
                     } else if move_val == max_value {
-                        println!("{} has the same move_val, adding to possibles",
-                            move_val_for.column);
+                        //println!("{} has the same move_val, adding to possibles",
+                        //    move_val_for.column);
                         possible_moves.push(move_val_for.column);
                     }
                 },
-                AlwaysLose => println!("Got AlwaysLose for {}", move_val_for.column),
-                InvalidMove => println!("Got invalid move for {}", move_val_for.column)
+                _ => ()
+                //AlwaysLose => println!("Got AlwaysLose for {}", move_val_for.column),
+                //InvalidMove => println!("Got invalid move for {}", move_val_for.column)
             }
         }
         if possible_moves.len() > 0 {
