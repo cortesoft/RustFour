@@ -251,6 +251,15 @@ impl Board {
         self.get_next_move()
     }
 
+    pub fn any_legal_moves(&self) -> bool {
+        for i in 0..self.num_columns {
+            if self.valid_move(i) {
+                return true;
+            }
+        }
+        false
+    }
+    
     pub fn valid_move(&self, col: u8) -> bool {
         col < self.num_columns && self.columns[(col as usize)].have_room()
     }

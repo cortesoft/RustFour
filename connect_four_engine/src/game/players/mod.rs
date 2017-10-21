@@ -3,6 +3,7 @@
 pub mod human;
 pub mod random;
 pub mod robot;
+pub mod smartbot;
 
 use super::board::*;
 

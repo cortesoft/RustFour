@@ -23,12 +23,18 @@ impl<T: Player, U: Player> Game<T, U> {
         }
     }
 
-    pub fn play_game(&mut self) -> u8 {
+    pub fn play_game(&mut self, player_1_is_x: bool) -> u8 {
         let mut board = self.board_template.clone();
+        let player_1_gamepiece = if player_1_is_x {
+            GamePiece::X
+        } else {
+            GamePiece::O
+        };
         board.print();
         for i in 0..500 {
             println!("On turn {}", i);
-            let mymove = if GamePiece::X == board.get_current_move() {
+            let mymove = 
+            if player_1_gamepiece == board.get_current_move() {
                 self.player_1.which_move(&board)
             } else {
                 self.player_2.which_move(&board)
@@ -46,6 +52,10 @@ impl<T: Player, U: Player> Game<T, U> {
                     return 2;
                 },
                 _ => ()
+            }
+            if !board.any_legal_moves() {
+                print!("There are no legal moves left! We have a draw!");
+                return 0;
             }
         }
         0
