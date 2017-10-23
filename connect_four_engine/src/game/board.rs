@@ -278,4 +278,18 @@ impl Board {
             GamePiece::Dash => GamePiece::Dash
         }
     }
+
+    pub fn string_representation(&self) -> String {
+        let mut s = String::with_capacity((self.num_rows * self.num_columns) as usize + 1);
+        for c in 0..self.num_columns {
+            for r in 0..self.num_rows {
+                match self.columns[(c as usize)].rows[(r as usize)] {
+                    GamePiece::X => s.push('x'),
+                    GamePiece::O => s.push('o'),
+                    GamePiece::Dash => s.push('-')
+                }
+            }
+        }
+        s
+    }
 }

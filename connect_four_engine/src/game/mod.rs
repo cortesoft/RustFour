@@ -33,10 +33,12 @@ impl<T: Player, U: Player> Game<T, U> {
         board.print();
         for i in 0..500 {
             println!("On turn {}", i);
-            let mymove = 
-            if player_1_gamepiece == board.get_current_move() {
+            let player_1_turn: bool; 
+            let mymove = if player_1_gamepiece == board.get_current_move() {
+                player_1_turn = true;
                 self.player_1.which_move(&board)
             } else {
+                player_1_turn = false;
                 self.player_2.which_move(&board)
             };
             println!("Playing {}", mymove);
@@ -45,10 +47,24 @@ impl<T: Player, U: Player> Game<T, U> {
             match board.have_winner() {
                 1 => {
                     println!("X won!");
+                    if player_1_turn {
+                        self.player_1.win();
+                        self.player_2.loss();
+                    } else {
+                        self.player_2.win();
+                        self.player_1.loss();
+                    }
                     return 1;
                 },
                 2 => {
                     println!("O won!");
+                    if player_1_turn {
+                        self.player_1.win();
+                        self.player_2.loss();
+                    } else {
+                        self.player_2.win();
+                        self.player_1.loss();
+                    }
                     return 2;
                 },
                 _ => ()

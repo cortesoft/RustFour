@@ -12,4 +12,5 @@ mod tests {
 
 extern crate rand;
 extern crate scoped_threadpool;
+extern crate redis;
 pub mod game;

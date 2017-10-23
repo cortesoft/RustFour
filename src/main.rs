@@ -8,12 +8,14 @@ use game::players::human::Human;
 use game::players::random::Random;
 use game::players::robot::Robot;
 use game::players::smartbot::SmartBot;
+use game::players::learnbot::LearnBot;
 
 fn main() {
     match get_player(1) {
         1 => choose_player_2(Human::build_player()),
         2 => choose_player_2(Robot::build_player()),
         3 => choose_player_2(SmartBot::build_player()),
+        4 => choose_player_2(LearnBot::build_player()),
         _ => choose_player_2(Random::build_player())
     };
 }
@@ -23,6 +25,7 @@ fn choose_player_2<T: Player>(player_1: T){
         1 => create_game(player_1, Human::build_player()),
         2 => create_game(player_1, Robot::build_player()),
         3 => create_game(player_1, SmartBot::build_player()),
+        4 => create_game(player_1, LearnBot::build_player()),
         _ => create_game(player_1, Random::build_player())
     };
 }
@@ -79,7 +82,7 @@ fn get_player(p_num: u8) -> u8 {
     let mut choice = String::new();
     let mut choice_i: u8;
     loop {
-        println!("For player {}, which type? (1 human, 2 Robot, 3 Smartbot, 4 Random)", p_num);
+        println!("For player {}, which type? (1 human, 2 Robot, 3 Smartbot, 4 learnbot, 5 Random)", p_num);
         io::stdin().read_line(&mut choice)
             .expect("Failed to read line");
         choice_i = match choice.trim().parse() {
@@ -90,7 +93,7 @@ fn get_player(p_num: u8) -> u8 {
                 continue;
             }
         };
-        if choice_i > 0 && choice_i < 5 {
+        if choice_i > 0 && choice_i < 6 {
             return choice_i;
         }
         println!("Invalid choice");
