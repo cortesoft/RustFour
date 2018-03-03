@@ -1,0 +1,6 @@
+[package]
+name = "neural_net"
+version = "0.1.0"
+authors = ["Daniel Lockhart <cortesoft@gmail.com>"]
+
+[dependencies]

@@ -5,5 +5,6 @@ authors = ["Daniel Lockhart <cortesoft@gmail.com>"]
 
 [dependencies]
 connect_four_engine = { path = "connect_four_engine" }
+neural_net = { path = "neural_net" }
 
 [workspace]
